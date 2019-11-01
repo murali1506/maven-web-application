@@ -1,0 +1,50 @@
+node('master')
+{
+  echo "GitHub BranhName ${env.BRANCH_NAME}"
+  echo "Jenkins Job Number ${env.BUILD_NUMBER}"
+  echo "Jenkins Node Name ${env.NODE_NAME}"
+  
+  echo "Jenkins Home ${env.JENKINS_HOME}"
+  echo "Jenkins URL ${env.JENKINS_URL}"
+  echo "JOB Name ${env.JOB_NAME}"
+  
+   properties([
+    buildDiscarder(logRotator(numToKeepStr: '3')),
+    pipelineTriggers([
+        pollSCM('* * * * *')
+    ])
+  ])
+  
+    def mvnHome=tool name: "maven3.6.2",type: "maven"
+    stage('CheckoutCode')
+    {
+        git branch: 'development', credentialsId: '940a4b1a-14b4-4fe6-9609-9e7f4c39b3bf', url: 'https://github.com/murali1506/maven-web-application.git'
+    }
+    stage('Build')
+    {
+        sh "${mvnHome}/bin/mvn clean package"
+    }
+    
+    stage('Sonarqubeareport')
+    {
+        sh "${mvnHome}/bin/mvn sonar:sonar"
+    }
+    stage('UploadArtifactintoNexus')
+    {
+        sh "${mvnHome}/bin/mvn sonar:sonar deploy"
+    }
+    stage('DeploytoContainer')
+    {
+       sshagent(['128ddd91-857c-44f0-b5b6-cdbff3a47e06']) 
+       {
+        sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@18.222.76.87:/opt/apache-tomcat-9.0.27/webapps/"
+       } 
+    }
+    stage('EmailNotification')
+    {
+    emailext body: '''Build Done, please check the log file
+
+regards,
+jenkins admin.''', subject: 'Build details', to: 'murali.86886@gmail.com'
+    }
+}
