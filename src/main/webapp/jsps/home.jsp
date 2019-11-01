@@ -18,7 +18,7 @@
 	</span>
 	<span style="font-weight: bold;">
 		Mithun Technologies, 
-		Martha Halli,Above ICICI bank, Next to Meghana Foods,
+		Martha Halli,Above ICICI bank, besides Meghana Foods,
 		Bangalore.
 		+91-9980923226,
 		<br>
