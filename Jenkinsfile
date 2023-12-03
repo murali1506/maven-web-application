@@ -81,7 +81,7 @@ stage('DeploytoTomcat'){
          
                   Regards,
                   Mithun Technologies,
-                  9980923226'''
+                  9980923226''
  }
  
  stage("SlackNotification"){
